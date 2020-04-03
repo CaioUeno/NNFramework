@@ -21,7 +21,7 @@ class network(object):
         
         self.task = task # avaliable values = ['classification', 'regression']
         self.layers = []
-        self.loss = binary_loss()
+        self.loss = mse_loss()
         self. history_loss = None
         
     def add(self, layers):
@@ -171,7 +171,7 @@ class network(object):
         ''' Check inputs '''
         
         if len(X) != len(y):
-            raise ValueError('X and y doesn\'t have same length. X: '+len(samples)+', y:'+len(targets))
+            raise ValueError('X and y doesn\'t have same length. X: '+ str(len(X)) + ', y:' + str(len(y)))
             
         self.check_X(X)
         self.check_y(y)
