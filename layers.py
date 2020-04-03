@@ -15,7 +15,7 @@ from hyper_parameters import *
 
 class neutral_layer(object):
     
-    '''Model of a layer's structure '''
+    ''' Model of a layer's structure '''
     
     def __init__(self, n_input, n_neurons, activation, learning_rate, hidden):
         
@@ -35,9 +35,11 @@ class neutral_layer(object):
         
     def feed_forward(self, in_features):
         
+        ''' Function apllied at in_features '''
+        
         return None
         
-    def choose_activation(self, activation):
+    def choose_activation(self, activation): 
         
         if activation == 'tanh':
             self.activation = tanh_activation()
@@ -53,23 +55,31 @@ class neutral_layer(object):
             
     def derivative_in(self, in_features):
         
+        ''' Feed foward function's derivative with respect to in_features '''
+        
         return None
     
     def derivative_weights(self, in_features):
+        
+        ''' Feed foward function's derivative with respect to self weights '''
         
         return None
     
     def calculate_delta(self, in_features, loss_derivative_applied=None, next_layer=None):
         
+        ''' Calculate layer's delta and layer weights' update values '''
+        
         if not self.hidden:
             self.delta = loss_derivative_applied * (self.activation.derivative(self.out))
     
-        else:
+        else: # if last layer only
             self.delta = (next_layer.delta @ next_layer.derivative_in(self.out)) * (self.activation.derivative(self.out)) 
 
         self.update += (self.delta * self.derivative_weights(in_features).T).T
         
     def update_weights(self, batch_size):
+        
+        ''' Update weights using mini-batch strategy '''
         
         self.update = (1/batch_size) * self.update
         self.weights -= self.learning_rate * self.update
@@ -116,20 +126,12 @@ class senoidal_layer(neutral_layer):
         
         self.out = self.activation.apply(np.sin(self.weights @ in_features) + self.bias)
         return self.out
+    
+    def derivative_in(self, in_features):
         
-    def calculate_delta(self, in_features, loss_derivative_applied=None, next_layer=None):
+        return np.cos(self.weights * np.array([in_features] * next_layer.n_neurons)) * self.weights
+    
+    def derivative_weights(self, in_features):
         
-        if not self.hidden:
-            self.delta = loss_derivative_applied * (self.activation.derivative(self.out))
-            
-        else:
-            self.delta = (next_layer.delta @ (np.cos(next_layer.weights * np.array([self.out] * next_layer.n_neurons)) * next_layer.weights)) *                                                  (self.activation.derivative(self.out)) 
-            
-        self.update += (self.delta * (np.cos(self.weights * np.array([in_features] * self.n_neurons)) *                                                            np.array([in_features] * self.n_neurons)).T).T
-        
-    def update_weights(self, batch_size):
-        
-        self.update = (1/batch_size) * self.update
-        self.weights -= self.learning_rate * self.update
-        self.update = np.zeros((self.n_neurons, self.n_input))
+        return np.cos(self.weights * np.array([in_features] * self.n_neurons)) * np.array([in_features] * self.n_neurons)
 

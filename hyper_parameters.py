@@ -130,31 +130,3 @@ class mse_loss(object):
         
         return pred - true        
 
-
-# In[37]:
-
-
-class binary_loss(object):
-    
-    def __init__(self):
-        
-        self.type_ = 'binary'
-        
-    def apply(self, true, pred):
-
-        return - np.nan_to_num(true * np.nan_to_num(np.log(pred)) + (1 - true) * np.nan_to_num(np.log(1 - pred)))
-        
-    def derivative(self, true, pred):
-        
-        dv = np.zeros(len(true))
-        
-        for i in range(len(true)):
-            
-            if true[i] == 1:
-                dv[i] = - true[i] / pred[i]
-                
-            else:
-                dv[i] = - (1 - true[i]) / (1 - pred[i])
-                
-        return np.nan_to_num(dv)
-
